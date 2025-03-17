@@ -21,19 +21,47 @@ function App() {
       option: selectedOption,
     };
 
+    const prompt =
+      {
+        Summarize: `Summarize the following text: ${data.text}`,
+        Paraphrase: `Paraphrase the following text: ${data.text}`,
+        Expand: `Expand on the following text: ${data.text}`,
+        Translate: `Translate the following text to Spanish: ${data.text}`,
+      }[data.option] || "Invalid option selected.";
+
     try {
-      // const response = await axios.post("http://127.0.0.1:3000/process", data);
+      // OpenAI API call
       const response = await axios.post(
-        `http://127.0.0.1:8080/process`,
-        { ...data },
+        "https://api.openai.com/v1/chat/completions",
+        {
+          model: "gpt-4o", // Ensure this is the correct model name
+          messages: [
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+          max_tokens: 150,
+          temperature: 0.7,
+        },
         {
           headers: {
+            Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
             "Content-Type": "application/json",
           },
-          withCredentials: false, // Set to true if using cookies or credentials
         }
       );
-      setMessage(response.data.message); // Assuming backend returns { message: ... }
+      console.log({ response });
+      const generatedText = response.data.choices[0].text.trim();
+      console.log(`Processed successfully: ${generatedText}`);
+
+      if (!response.status) {
+        throw new Error("Failed to fetch data");
+      }
+
+      const data = await response?.data?.json();
+      console.log("Response from OpenAI:", data);
+      setMessage(data); // Assuming backend returns { message: ... }
     } catch (error) {
       console.error("Error sending data", error);
       setMessage("Failed to generate output.");
