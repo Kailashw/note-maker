@@ -4,6 +4,7 @@ import "./App.css"; // Import the custom CSS file
 
 function App() {
   const [message, setMessage] = useState("");
+  const [apiToken, setApiToken] = useState("")
   const [inputText, setInputText] = useState("");
   const [selectedOption, setSelectedOption] = useState("Summarize");
   const [error, setError] = useState("");
@@ -19,6 +20,7 @@ function App() {
     const data = {
       text: inputText,
       option: selectedOption,
+      apiToken : apiToken,
     };
 
     const prompt =
@@ -46,7 +48,8 @@ function App() {
         },
         {
           headers: {
-            Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
+            // Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
+            Authorization: `Bearer ${apiToken}`,
             "Content-Type": "application/json",
           },
         }
@@ -78,6 +81,11 @@ function App() {
   return (
     <div className="container">
       <h1>Text Manipulator App</h1>
+      <h4> Enter you Open AI API Token here : </h4>
+      <input name="title" 
+         value={apiToken} 
+         onChange={(e)=> setApiToken(e.target.value)} 
+         placeholder="Enter you Open AI API Token here"/>
       <form className="card" onSubmit={(e) => e.preventDefault()}>
         <h2>Enter the Input</h2>
         <textarea
